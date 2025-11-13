@@ -146,15 +146,14 @@
           </div>
         </div>
         
-        <form class="form card" action="https://formspree.io/f/mldadkkb" method="POST">
+        <form id="rsvpForm" class="form card" action="https://formspree.io/f/mldadkkb" method="POST">
           <div>
             <label for="msg">Alguma coisa que nos queiras dizer?</label>
             <textarea id="msg" name="message" placeholder="Alergias/Intolerâncias alimentares, dúvidas de estadia, ou até uma mensagem que nos querias deixar... 😊"></textarea>
           </div>
 
           <!-- Campos que queres receber -->
-          <!-- Redirect to custom thank-you page (Formspree supports _redirect) -->
-          <input type="hidden" name="_redirect" value="https://jmartinho25.github.io/sofiaepedrowedding/obrigado.html">
+          <!-- Formspree native redirect deprecated; we handle redirect via JS -->
           <input type="hidden" name="form" value="RSVP Casamento Sofia & Pedro">
 
           <button class="btn" type="submit">Enviar</button>
@@ -212,6 +211,47 @@
           sel.removeAllRanges(); sel.addRange(range);
         }
         alert('Não foi possível copiar automaticamente. Selecciona o IBAN e copia manualmente.');
+      }
+    });
+  })();
+</script>
+<script>
+  // JS submit handler for Formspree: send via fetch and redirect to obrigado.html
+  (function(){
+    const form = document.getElementById('rsvpForm');
+    if(!form) return;
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.textContent : '';
+      if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = 'Enviando…'; }
+
+      const action = form.getAttribute('action') || window.location.href;
+      const data = new FormData(form);
+
+      try{
+        const res = await fetch(action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if(res.ok){
+          // success - redirect to local thank-you page
+          window.location.href = './obrigado.html';
+          return;
+        }
+
+        // try to get error details from JSON response
+        let json = null;
+        try{ json = await res.json(); }catch(_){ }
+        const msg = (json && (json.error || json.message)) ? (json.error || json.message) : 'Erro ao enviar o formulário.';
+        throw new Error(msg);
+      }catch(err){
+        console.error('Form submit failed', err);
+        if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = originalText; }
+        alert('Falha no envio. Tenta novamente mais tarde ou contacta-nos por email.');
       }
     });
   })();
