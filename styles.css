@@ -7,7 +7,7 @@
   --gold:#C9A95A;
   --gold-dark:#BD9754;
   --maxw:1100px;
-  --hero-image: url('fotos_convite_web/large/IMG_9448.webp');
+  --hero-image: url('fotos_convite_web/large/IMG_9448.jpg');
 }
 
 h1 {
@@ -216,6 +216,32 @@ p{margin:0 0 14px; font-size: clamp(16px, 1.8vw, 19px);}
     font-weight: 700;
     font-size: clamp(28px, 6vw, 48px);} 
 
+/* Make the historia text section visually match the carousels on desktop:
+   target only the non-carousel card (the centered story text) so carousel
+   cards keep their padding/background. */
+#historia > .wrap .card:not(.carousel-card){
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  max-width: 520px;
+  margin: 0 auto 18px;
+}
+@media(max-width:900px){
+  /* restore card visuals on mobile for spacing and contrast */
+  #historia > .wrap .card:not(.carousel-card){
+    background:#fff; border:1px solid rgba(0,0,0,.06); box-shadow:0 10px 30px rgba(0,0,0,.06);
+    padding:22px; max-width:none; margin-bottom:0;
+  }
+}
+
+/* Increase vertical spacing between the three #historia wraps so carousels
+   and the text have more breathing room. Smaller on mobile, larger on desktop. */
+#historia > .wrap{ margin-bottom: 28px; }
+@media(min-width:900px){
+  #historia > .wrap{ margin-bottom: 56px; }
+}
+
 /* increase vertical spacing between the historia text card and the carousel grid */
 #historia > .wrap + .wrap.grid.two{
   margin-top: 36px;
@@ -296,7 +322,7 @@ textarea{min-height:75px; resize:vertical; margin-top: 10px;max-width: 100%;}
 .ibanBox .copy-feedback{ margin-left:6px; font-size:13px; color:rgba(255,255,255,0.95); opacity:0; transform:translateY(-4px); transition:opacity .18s ease, transform .18s ease }
 .ibanBox.copied .copy-feedback{ opacity:1; transform:none }
 
-.mini{font-size:13px; margin-left:8px}
+.mini{font-size:clamp(14px, 1.6vw, 18px); margin-left:8px}
 .caption{margin-top:10px}
 
 /* Fix caption height in the historia carousel so card doesn't change height
@@ -310,19 +336,19 @@ textarea{min-height:75px; resize:vertical; margin-top: 10px;max-width: 100%;}
   align-items:center;
   justify-content:center;
   text-align:center;
-  line-height:1.4;
-  /* reserve 3 lines by default */
-  height: calc(1.4em * 3);
-  max-height: calc(1.4em * 3);
+  line-height:1.45;
+  /* reserve 4 lines by default to accommodate larger captions */
+  height: calc(1.45em * 4);
+  max-height: calc(1.45em * 4);
   overflow: hidden;
   white-space: normal;
 }
 
 @media(max-width:520px){
   #historia .caption{
-    /* reserve 2 lines on small screens */
-    height: calc(1.4em * 2);
-    max-height: calc(1.4em * 2);
+    /* reserve 3 lines on small screens */
+    height: calc(1.45em * 3);
+    max-height: calc(1.45em * 3);
   }
 }
 .footer{
@@ -528,7 +554,20 @@ textarea{min-height:75px; resize:vertical; margin-top: 10px;max-width: 100%;}
 .carousel-dots button{width:10px; height:10px; border-radius:999px; border:0; background:rgba(255,255,255,.6); cursor:pointer}
 .carousel-dots button.active{background:var(--gold)}
 
+/* Reveal animation helpers for section entrance */
+.reveal{ opacity:0; transform:translateY(12px); transition:opacity .54s cubic-bezier(.2,.9,.22,1), transform .54s cubic-bezier(.2,.9,.22,1); will-change:opacity,transform }
+.reveal.in-view{ opacity:1; transform:none }
+@media (prefers-reduced-motion: reduce){ .reveal{ transition:none; transform:none; opacity:1 } }
+
 /* remove fixed pixel heights so slides remain perfectly square on all breakpoints */
+/* Keep slides 1:1 but constrain the carousel width in #historia so they don't
+   grow to full-viewport width on large desktop screens. This preserves the
+   square crop while keeping visual balance. */
+#historia .carousel-card{ max-width: 520px; margin: 0 auto; padding: 6px }
+#historia .carousel{ width:100%; }
+@media(min-width:1200px){
+  #historia .carousel-card{ max-width: 520px; }
+}
 
 
 .floral{
@@ -578,4 +617,18 @@ textarea{min-height:75px; resize:vertical; margin-top: 10px;max-width: 100%;}
   .thank-card{ margin:0 12px 16px; padding:20px }
   .thank-hero{ min-height:28vh }
   .thank-hero .wrap{ padding-top:6px }
+}
+
+/* User request: force the historia text to NOT use a card background on any size.
+   This removes the white panel look and keeps the text visually consistent
+   with the carousels (plain, centered block). */
+#historia > .wrap.hist-text,
+#historia > .wrap .card:not(.carousel-card){
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  max-width: 520px;
+  margin: 0 auto 18px;
+  text-align: center;
 }
