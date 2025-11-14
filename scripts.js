@@ -1,7 +1,3 @@
-// scripts.js — extracted from inline scripts in index.html
-// Loaded with `defer` to run after the DOM is parsed.
-
-// Smooth in-page anchor scrolling
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
     const id=a.getAttribute('href').slice(1);
@@ -24,13 +20,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
       await navigator.clipboard.writeText(iban);
       if(box) box.classList.add('copied');
       if(feedback) feedback.textContent = 'Copiado!';
-      // remove feedback after a short delay
       setTimeout(()=>{
         if(box) box.classList.remove('copied');
         if(feedback) feedback.textContent = '';
       }, 1400);
     }catch(err){
-      // fallback: select the iban text for manual copy
       if(ibanTextEl){
         const range = document.createRange();
         range.selectNodeContents(ibanTextEl);
@@ -64,12 +58,10 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
       });
 
       if(res.ok){
-        // success - redirect to local thank-you page
         window.location.href = './obrigado.html';
         return;
       }
 
-      // try to get error details from JSON response
       let json = null;
       try{ json = await res.json(); }catch(_){ }
       const msg = (json && (json.error || json.message)) ? (json.error || json.message) : 'Erro ao enviar o formulário.';
@@ -93,7 +85,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     const captionEl = carousel.parentElement.querySelector('.caption');
     const defaultCaption = captionEl ? captionEl.textContent.trim() : '';
 
-    // If files not provided, derive names from captions length (1.webp ... n.webp)
     const fileList = (files && files.length) ? files : captions.map((_,i)=> `${i+1}.webp`);
 
     fileList.forEach((f,i)=>{
@@ -131,14 +122,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 
     const slidesCount = fileList.length;
 
-    // update the track position; when `animate` is false we temporarily disable the
-    // CSS transition so a wrap jump (last -> first or first -> last) doesn't animate
-    // across all slides which looks awkward.
     let started = false;
     let visible = false;
 
     function play(){
-      if(timer) return; // already playing
+      if(timer) return;
       timer = setInterval(next, delay);
     }
 
@@ -149,9 +137,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     function start(){
       if(started) return;
       started = true;
-      // ensure we show the current slide immediately when starting
       update();
-      // only start autoplay if the carousel is visible
       if(visible) play();
     }
 
@@ -160,9 +146,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
         const prevTrans = track.style.transition;
         track.style.transition = 'none';
         track.style.transform = `translateX(-${index * 100}%)`;
-        // force a reflow so the style change takes effect immediately
         track.getBoundingClientRect();
-        // restore transition on the next frame
         requestAnimationFrame(()=>{ track.style.transition = prevTrans || ''; });
       }else{
         track.style.transform = `translateX(-${index * 100}%)`;
@@ -189,7 +173,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 
     function resetTimer(){
       if(!started){ start(); return; }
-      // restart timer only if currently visible
       pause();
       if(visible) play();
     }
@@ -202,8 +185,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     carousel.addEventListener('keydown', (e)=>{ if(e.key === 'ArrowLeft'){ start(); prev(); resetTimer(); } if(e.key === 'ArrowRight'){ start(); next(); resetTimer(); } });
     carousel.tabIndex = 0;
 
-    // Use IntersectionObserver to track visibility and only autoplay while visible.
-    // This ensures the carousel doesn't keep animating in the background.
     const io = new IntersectionObserver((entries)=>{
       entries.forEach(en=>{
         if(en.isIntersecting){
@@ -219,10 +200,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     }, { threshold: 0.25 });
     io.observe(carousel);
 
-    // Pause autoplay while the page is zoomed (pinch-zoom). On some mobile
-    // browsers, when the viewport is scaled the browser rasteriser increases
-    // memory usage and animated transitions can trigger a renderer crash.
-    // Use the visualViewport API where available to detect scale and pause.
+
     const ZOOM_THRESHOLD = 1.02;
     function isZoomed(){
       try{ return (window.visualViewport && window.visualViewport.scale) ? (window.visualViewport.scale > ZOOM_THRESHOLD) : false; }
@@ -231,27 +209,22 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     if(window.visualViewport){
       const onVV = ()=>{
         if(isZoomed()){
-          // pause autoplay while zoomed
           pause();
         }else{
-          // resume autoplay only if carousel is visible and started
           if(visible && started) play();
         }
       };
       window.visualViewport.addEventListener('resize', onVV);
-      // run once to set initial state
       onVV();
     }
 
-    // Also start on pointer/focus interaction in case user interacts before it comes into view
     carousel.addEventListener('pointerenter', ()=>{ visible = true; start(); if(!isZoomed()) play(); }, { once:true });
     carousel.addEventListener('focus', ()=>{ visible = true; start(); if(!isZoomed()) play(); }, { once:true });
 
-    // ensure initial layout is correct (no auto-advance yet)
     update();
   }
 
-  // Main carousel (existing images)
+  // Main carousel
   const mainFiles = [
     "1.webp","2.webp","3.webp","4.webp","5.webp","6.webp","7.webp","8.webp","9.webp","10.webp",
     "11.webp","12.webp","13.webp","14.webp","15.webp","16.webp","17.webp","18.webp","19.webp","20.webp",
@@ -346,7 +319,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     'Festejando 3 meses de namoro, Taipas, Junho 2012'
   ];
 
-  // Second carousel captions (user-provided)
+  // Second carousel captions
   const captions2 = [
     'Menina desperta','Menino dorminhoco','Menina divertida','Menino assustadiço','Menina toma banho na bacia',
     'Menino molha os pés na piscina','Menina de amarelo com o seu Vô Bastião','Menino de amarelo com o seu Bú Macedo',
@@ -385,11 +358,3 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   });
 
 })();
-
-/* Reveal-on-scroll disabled per user request: scroll reveal animations
-   caused problems; the logic has been removed so no JS-controlled
-   reveal/staggering will run. Elements may still have the `reveal` class
-   in the markup, but its styles are overridden in CSS to be inert. */
-
-/* All scroll reveal JS disabled per user request. No scoped reveal observer
-   runs now; the page will not attempt to add/remove `.in-view` classes. */

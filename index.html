@@ -2,12 +2,7 @@
 <html lang="pt">
 <head>
 <meta charset="utf-8" />
-<!-- Temporarily disable pinch-zoom on mobile to mitigate crash/reload issues.
-  Note: this reduces accessibility (users cannot zoom). If this fixes the
-  issue we'll keep as a temporary mitigation while implementing a better
-  solution (image virtualisation). To revert, restore the original meta. -->
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <!-- prevent iOS Safari from auto-detecting telephone numbers (IBAN should not become a tel: link) -->
   <meta name="format-detection" content="telephone=no">
 <title>Sofia & Pedro — 4 de Julho de 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600&family=Cormorant+Garamond:wght@300;400;700&display=swap" rel="stylesheet" />
@@ -23,19 +18,14 @@
       <h1>SOFIA &amp; PEDRO</h1>
     </div>
   </div>
-
-  <!-- center left intentionally empty to show the hero image -->
-
   <div class="hero-bottom">
     <div class="wrap">
       <p class="sub">4 de Julho de 2026</p>
-      <!-- <p class="place muted">Mosteiro de Landim</p> -->
     </div>
   </div>
 </header>
 
 <section class="sec announce" id="announce">
-  <!-- bleed images placed outside the centered wrap so they can touch viewport edges -->
   <div class="announce-bleed announce-left">
     <img src="fotos_convite_web/flores_esquerda.webp" alt="Flores" loading="lazy">
   </div>
@@ -54,7 +44,6 @@
 </section>
 
 <section class="sec soft" id="historia">
-  <!-- First carousel (reveal) -->
   <div class="wrap">
     <div class="card carousel-card reveal">
       <div id="histCarousel2" class="carousel" aria-roledescription="carousel">
@@ -66,7 +55,6 @@
     </div>
   </div>
 
-  <!-- Centered story text (reveal) -->
   <div class="wrap reveal">
     <div class="card">
       <h2>A NOSSA HISTÓRIA</h2>
@@ -78,7 +66,6 @@
     </div>
   </div>
 
-  <!-- Second carousel (reveal) -->
   <div class="wrap">
     <div class="card carousel-card reveal">
       <div id="histCarousel" class="carousel" aria-roledescription="carousel">
@@ -92,7 +79,6 @@
 </section>
 
 <section class="sec alt" id="cerimonia">
-  <!-- <div class="wrap grid two"> -->
         <div class="moment-grid">
           <div class="moment-grid-item moment-left">
             <img src="outras_fotos/IMG_2494.jpg" alt="Outra foto" loading="lazy">
@@ -110,15 +96,6 @@
             <img src="fotos_convite_web/landim_sem_fundo.webp" alt="Mosteiro de Landim" loading="lazy">
           </div>
         </div>
-      <!-- </div> -->
-      <!-- <div class="card">
-        <div class="card">
-          <div class="embed-wrap">
-            <iframe class="embed-iframe" title="Mapa Mosteiro de Landim" src="https://www.google.com/maps?q=Mosteiro%20de%20Landim%2C%20Vila%20Nova%20de%20Famalic%C3%A3o&output=embed" loading="lazy"></iframe>
-          </div>
-        </div>
-      </div> -->
- 
 </section>
 
 <section class="sec announce sage" id="festa">
@@ -141,11 +118,8 @@
       <div class="ibanBox">
           <div class="iban-row">
       <strong>IBAN:</strong>
-      <!-- insert invisible zero-width characters to break phone-number detection on iOS
-        data-iban remains unchanged so copy-to-clipboard copies the clean value -->
       <span id="ibanText">PT50&#8203; 0023&#8203; 0000&#8203; 4575&#8203; 9267&#8203; 3299&#8203; 4</span>
             <button class="copy-iban" type="button" aria-label="Copiar IBAN" data-iban="PT50 0023 0000 4575 9267 3299 4">
-              <!-- copy icon -->
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M16 1H4a2 2 0 0 0-2 2v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                 <rect x="8" y="5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -161,15 +135,10 @@
             <textarea id="msg" name="message" placeholder="Alergias/Intolerâncias alimentares, dúvidas de estadia, ou até uma mensagem que nos queiras deixar... 😊"></textarea>
           </div>
 
-          <!-- Campos que queres receber -->
-          <!-- Formspree native redirect deprecated; we handle redirect via JS -->
           <input type="hidden" name="form" value="RSVP Casamento Sofia & Pedro">
 
           <button class="btn" type="submit">Enviar</button>
         </form>
-
-        <!-- JavaScript handler removed: form will submit normally to Formspree and use the `_redirect` field -->
-
       </div>
     </div>
   </div>
