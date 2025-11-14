@@ -370,10 +370,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   // Auto-assign `.reveal` to common content blocks unless the author opted out
   // with `.no-reveal`. This enables the effect site-wide without editing HTML.
   const autoSelectors = [
-    'section > .wrap',
+    // 'section > .wrap',
     '.card:not(.carousel-card)',
     '.moment-grid-item',
-    '#announce',
+    '#announce > .wrap',
+    '#festa > .wrap'
   ];
   autoSelectors.forEach(sel => {
     document.querySelectorAll(sel).forEach(el => {
