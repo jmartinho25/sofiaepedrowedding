@@ -654,6 +654,27 @@ textarea{min-height:75px; resize:vertical; margin-top: 10px;max-width: 100%;}
   text-align: center;
 }
 
+/* DISABLE Reveal Animations: make `.reveal` a no-op globally
+   The JS reveal logic has been removed; keep these defensive overrides
+   so any remaining `reveal` classes in the markup won't animate or
+   cause visual surprises. */
+.reveal,
+.reveal.in-view{
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+/* Re-enable predictable reveal styling inside the historia section only. */
+#historia .reveal{
+  opacity: 0 !important;
+  transform: translateY(8px) !important;
+  transition: opacity .36s cubic-bezier(.2,.9,.22,1), transform .36s cubic-bezier(.2,.9,.22,1) !important;
+  will-change: opacity, transform !important;
+}
+#historia .reveal.in-view{ opacity:1 !important; transform:none !important }
+
 /* Performance helpers: promote compositing layers and reduce costly effects on mobile
    These are conservative changes intended to improve scroll/animation smoothness
    on low-end devices by forcing compositing and reducing heavy shadows/backdrop. */

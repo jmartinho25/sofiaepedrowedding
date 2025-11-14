@@ -362,87 +362,62 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 
 })();
 
-// Reveal-on-scroll (global): observe every element with `.reveal`
-// Appear when scrolling down into view, disappear when scrolling up out of view.
+/* Reveal-on-scroll disabled per user request: scroll reveal animations
+   caused problems; the logic has been removed so no JS-controlled
+   reveal/staggering will run. Elements may still have the `reveal` class
+   in the markup, but its styles are overridden in CSS to be inert. */
+
+// Scoped reveal for `#historia` only. This observer re-enables staggered
+// reveal inside the historia section while leaving the rest of the page
+// inert. It adds `.in-view` when elements enter and removes it when they
+// leave, but the removal is done instantly (no reverse transition) so the
+// exit is not visually janky.
 (function(){
+  const root = document.getElementById('historia');
+  if(!root) return;
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  // Auto-assign `.reveal` to common content blocks unless the author opted out
-  // with `.no-reveal`. This enables the effect site-wide without editing HTML.
-  const autoSelectors = [
-    'section > .wrap',
-    '.card:not(.carousel-card)',
-    '.moment-grid-item',
-  ];
-  autoSelectors.forEach(sel => {
-    document.querySelectorAll(sel).forEach(el => {
-      // Skip if the element explicitly opted out, or if it contains a form
-      // (we don't want forms to animate by default).
-      if(el.classList.contains('reveal') || el.classList.contains('no-reveal')) return;
-      // Do not auto-mark inner forms as `no-reveal`; rely on CSS to keep
-      // forms visually static, and let authors opt-out with `no-reveal` if
-      // desired. This simplifies behavior and avoids mobile detection issues.
-      el.classList.add('reveal');
-    });
+  // select sensible elements inside historia to animate
+  // use `:scope > .wrap` rather than `> .wrap` because a selector cannot
+  // start with a combinator — using `:scope` is the correct scoped child selector.
+  const selectors = [':scope > .wrap', '.card:not(.carousel-card)', '.carousel-card'];
+  const toReveal = [];
+  selectors.forEach(s => {
+    try{
+      root.querySelectorAll(s).forEach(el => toReveal.push(el));
+    }catch(err){
+      // if a selector is unsupported in an environment, skip it gracefully
+      console.warn('Scoped reveal: selector failed', s, err);
+    }
   });
+  if(toReveal.length === 0) return;
 
-  // Collect all revealable elements on the page. Authors can still control
-  // exactly where animations run by adding/removing the `reveal` class.
-  const reveals = Array.from(document.querySelectorAll('.reveal'));
-  if(reveals.length === 0) return;
+  // ensure they have the reveal class (authors can still opt-out with .no-reveal)
+  toReveal.forEach(el => { if(!el.classList.contains('no-reveal')) el.classList.add('reveal'); });
 
-  // keep pending timers so we can cancel them if the element leaves before the timeout
   const timers = new WeakMap();
+  const baseStagger = 25;
 
-  // adaptive stagger: shorter on small screens to keep cascades fast on mobile
-  const baseStagger = 20;
-
-  // Make the observer more tolerant: use several thresholds and a small
-  // negative bottom rootMargin so elements trigger slightly earlier.
-  const obs = new IntersectionObserver((entries) => {
+  const obs = new IntersectionObserver((entries)=>{
     entries.forEach(entry => {
       const el = entry.target;
-      const idx = reveals.indexOf(el);
-      // use a small stagger for items that live in the same list; if element isn't
-      // in the reveals array (shouldn't happen) fall back to 0
+      const idx = toReveal.indexOf(el);
       const delay = (idx >= 0 ? Math.max(0, idx) * baseStagger : 0);
-
-      // Consider element visible if either isIntersecting is true or the
-      // intersectionRatio is non-zero (covers edge-cases where isIntersecting
-      // can be false while a sliver is visible). Use a small tolerance.
-      const visibleNow = entry.isIntersecting || (entry.intersectionRatio && entry.intersectionRatio > 0.005);
+      const visibleNow = entry.isIntersecting || (entry.intersectionRatio && entry.intersectionRatio > 0.01);
 
       if(visibleNow){
-        // schedule adding the class with a stagger; store timer so it can be cleared
-        const t = setTimeout(()=>{
-          el.classList.add('in-view');
-          timers.delete(el);
-        }, delay);
+        const t = setTimeout(()=>{ el.classList.add('in-view'); timers.delete(el); }, delay);
         timers.set(el, t);
       }else{
-        // element is leaving the viewport: cancel any pending add and remove
-        // the `in-view` class, but do so without playing the reverse transition.
-        // This lets the element animate again the next time it enters while
-        // avoiding a visible "animate out" when scrolling up.
         const pending = timers.get(el);
         if(pending){ clearTimeout(pending); timers.delete(el); }
-
-        // Temporarily disable inline transition so removing the class does
-        // not trigger the CSS transition. We restore the inline style on the
-        // next frame so future additions of `.in-view` will animate normally.
-        const prevInline = el.style.transition;
-        try{
-          el.style.transition = 'none';
-          el.classList.remove('in-view');
-          // force reflow to apply the immediate state change
-          el.getBoundingClientRect();
-        }finally{
-          // restore previous inline transition on the next animation frame
-          requestAnimationFrame(()=>{ el.style.transition = prevInline || ''; });
-        }
+        // remove `.in-view` instantly without running the reverse transition
+        const prev = el.style.transition;
+        try{ el.style.transition = 'none'; el.classList.remove('in-view'); el.getBoundingClientRect(); }
+        finally{ requestAnimationFrame(()=>{ el.style.transition = prev || ''; }); }
       }
     });
-  }, { threshold: [0, 0.005, 0.02, 0.18], rootMargin: '0px 0px -6% 0px' });
+  }, { threshold: [0, 0.01, 0.12], rootMargin: '0px 0px -8% 0px' });
 
-  reveals.forEach(r => obs.observe(r));
+  toReveal.forEach(r => obs.observe(r));
 })();
