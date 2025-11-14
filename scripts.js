@@ -379,12 +379,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
       // Skip if the element explicitly opted out, or if it contains a form
       // (we don't want forms to animate by default).
       if(el.classList.contains('reveal') || el.classList.contains('no-reveal')) return;
-      if(el.querySelector){
-        const forms = el.querySelectorAll('form');
-        if(forms.length){
-          forms.forEach(f => f.classList.add('no-reveal'));
-        }
-      }
+      // Do not auto-mark inner forms as `no-reveal`; rely on CSS to keep
+      // forms visually static, and let authors opt-out with `no-reveal` if
+      // desired. This simplifies behavior and avoids mobile detection issues.
       el.classList.add('reveal');
     });
   });
@@ -398,7 +395,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   const timers = new WeakMap();
 
   // adaptive stagger: shorter on small screens to keep cascades fast on mobile
-  const baseStagger = 40;
+  const baseStagger = 20;
 
   // Make the observer more tolerant: use several thresholds and a small
   // negative bottom rootMargin so elements trigger slightly earlier.
@@ -423,10 +420,26 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
         }, delay);
         timers.set(el, t);
       }else{
-        // leaving viewport: cancel any pending add and remove immediately
+        // element is leaving the viewport: cancel any pending add and remove
+        // the `in-view` class, but do so without playing the reverse transition.
+        // This lets the element animate again the next time it enters while
+        // avoiding a visible "animate out" when scrolling up.
         const pending = timers.get(el);
         if(pending){ clearTimeout(pending); timers.delete(el); }
-        el.classList.remove('in-view');
+
+        // Temporarily disable inline transition so removing the class does
+        // not trigger the CSS transition. We restore the inline style on the
+        // next frame so future additions of `.in-view` will animate normally.
+        const prevInline = el.style.transition;
+        try{
+          el.style.transition = 'none';
+          el.classList.remove('in-view');
+          // force reflow to apply the immediate state change
+          el.getBoundingClientRect();
+        }finally{
+          // restore previous inline transition on the next animation frame
+          requestAnimationFrame(()=>{ el.style.transition = prevInline || ''; });
+        }
       }
     });
   }, { threshold: [0, 0.005, 0.02, 0.18], rootMargin: '0px 0px -6% 0px' });

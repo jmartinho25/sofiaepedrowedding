@@ -95,6 +95,15 @@ p{margin:0 0 14px; font-size: clamp(16px, 1.8vw, 19px);}
   .hero-bottom .place{ font-size:13px }
 }
 
+  /* Keep forms visually static inside reveal containers to avoid input focus
+     surprises and layout jitter on mobile. Authors can still opt-out with
+     `form.no-reveal` if they want different behaviour. */
+  .reveal form,
+  .reveal .form{
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
 /* Keep the top/bottom hero layout on all screen sizes.
    Provide small adjustments on very narrow screens so text doesn't get clipped. */
 @media(max-width:420px){
@@ -643,4 +652,38 @@ textarea{min-height:75px; resize:vertical; margin-top: 10px;max-width: 100%;}
   max-width: 520px;
   margin: 0 auto 18px;
   text-align: center;
+}
+
+/* Performance helpers: promote compositing layers and reduce costly effects on mobile
+   These are conservative changes intended to improve scroll/animation smoothness
+   on low-end devices by forcing compositing and reducing heavy shadows/backdrop. */
+.reveal,
+.carousel-track,
+.carousel-slide,
+.carousel-btn,
+.card,
+.rsvp-image,
+.moment-grid img,
+.announce-bleed img{
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+@media(max-width:900px){
+  /* Remove or soften shadows and heavy backdrop-filter on smaller screens */
+  .carousel-btn{ box-shadow: none !important; backdrop-filter: none !important; }
+  .card{ box-shadow: none !important; }
+  .rsvp-image{ transition: transform .18s ease !important; box-shadow: none !important; }
+  /* Slightly shorten carousel track transitions on mobile for cheaper repaints */
+  .carousel-track{ transition: transform .32s linear !important; }
+  /* Make reveal transitions cheaper on mobile (already tuned elsewhere but reinforce here) */
+  .reveal{ transition-duration: .18s !important; transform: translateZ(0) !important; }
+}
+
+@media(max-width:520px){
+  /* Further disable some hover/transform transitions that can cause jank on very narrow devices */
+  .rsvp-image{ transition: none !important; }
 }
