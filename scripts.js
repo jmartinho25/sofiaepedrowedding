@@ -373,7 +373,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     'section > .wrap',
     '.card:not(.carousel-card)',
     '.moment-grid-item',
-    '#announce > .wrap',
+    '#announce',
   ];
   autoSelectors.forEach(sel => {
     document.querySelectorAll(sel).forEach(el => {
