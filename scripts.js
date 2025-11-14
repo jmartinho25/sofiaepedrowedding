@@ -370,18 +370,21 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   // Auto-assign `.reveal` to common content blocks unless the author opted out
   // with `.no-reveal`. This enables the effect site-wide without editing HTML.
   const autoSelectors = [
-    // 'section > .wrap',
+    'section > .wrap',
     '.card:not(.carousel-card)',
     '.moment-grid-item',
-    '#announce > .wrap',
-    '#festa > .wrap'
   ];
   autoSelectors.forEach(sel => {
     document.querySelectorAll(sel).forEach(el => {
       // Skip if the element explicitly opted out, or if it contains a form
       // (we don't want forms to animate by default).
       if(el.classList.contains('reveal') || el.classList.contains('no-reveal')) return;
-      if(el.querySelector && el.querySelector('form')) return;
+      if(el.querySelector){
+        const forms = el.querySelectorAll('form');
+        if(forms.length){
+          forms.forEach(f => f.classList.add('no-reveal'));
+        }
+      }
       el.classList.add('reveal');
     });
   });
@@ -394,15 +397,25 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   // keep pending timers so we can cancel them if the element leaves before the timeout
   const timers = new WeakMap();
 
+  // adaptive stagger: shorter on small screens to keep cascades fast on mobile
+  const baseStagger = 40;
+
+  // Make the observer more tolerant: use several thresholds and a small
+  // negative bottom rootMargin so elements trigger slightly earlier.
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       const el = entry.target;
       const idx = reveals.indexOf(el);
       // use a small stagger for items that live in the same list; if element isn't
       // in the reveals array (shouldn't happen) fall back to 0
-      const delay = (idx >= 0 ? Math.max(0, idx) * 20 : 0);
+      const delay = (idx >= 0 ? Math.max(0, idx) * baseStagger : 0);
 
-      if(entry.isIntersecting){
+      // Consider element visible if either isIntersecting is true or the
+      // intersectionRatio is non-zero (covers edge-cases where isIntersecting
+      // can be false while a sliver is visible). Use a small tolerance.
+      const visibleNow = entry.isIntersecting || (entry.intersectionRatio && entry.intersectionRatio > 0.005);
+
+      if(visibleNow){
         // schedule adding the class with a stagger; store timer so it can be cleared
         const t = setTimeout(()=>{
           el.classList.add('in-view');
@@ -416,7 +429,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
         el.classList.remove('in-view');
       }
     });
-  }, { threshold: 0.18 });
+  }, { threshold: [0, 0.005, 0.02, 0.18], rootMargin: '0px 0px -6% 0px' });
 
   reveals.forEach(r => obs.observe(r));
 })();

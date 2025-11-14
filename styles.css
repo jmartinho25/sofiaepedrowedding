@@ -559,6 +559,18 @@ textarea{min-height:75px; resize:vertical; margin-top: 10px;max-width: 100%;}
 .reveal.in-view{ opacity:1; transform:none }
 @media (prefers-reduced-motion: reduce){ .reveal{ transition:none; transform:none; opacity:1 } }
 
+/* Mobile: enable faster, cheaper reveal transitions rather than disabling them.
+   Use smaller translateY and shorter duration so animations feel snappy and
+   avoid visible layout jitter on low-end devices. */
+@media(max-width:700px){
+  .reveal{
+    transition: opacity .20s cubic-bezier(.2,.9,.22,1), transform .28s cubic-bezier(.2,.9,.22,1) !important;
+    transform: translateY(6px) !important;
+    will-change: opacity, transform;
+  }
+  .reveal.in-view{ opacity:1; transform:none }
+}
+
 /* remove fixed pixel heights so slides remain perfectly square on all breakpoints */
 /* Keep slides 1:1 but constrain the carousel width in #historia so they don't
    grow to full-viewport width on large desktop screens. This preserves the
