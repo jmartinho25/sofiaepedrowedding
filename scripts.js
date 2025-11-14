@@ -362,13 +362,32 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 
 })();
 
-// Reveal on scroll for #historia blocks with a small stagger
+// Reveal-on-scroll (global): observe every element with `.reveal`
 // Appear when scrolling down into view, disappear when scrolling up out of view.
 (function(){
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const section = document.getElementById('historia');
-  if(!section) return;
-  const reveals = Array.from(section.querySelectorAll('.reveal'));
+
+  // Auto-assign `.reveal` to common content blocks unless the author opted out
+  // with `.no-reveal`. This enables the effect site-wide without editing HTML.
+  const autoSelectors = [
+    'section > .wrap',
+    '.card:not(.carousel-card)',
+    '.moment-grid-item',
+    '#announce > .wrap',
+  ];
+  autoSelectors.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      // Skip if the element explicitly opted out, or if it contains a form
+      // (we don't want forms to animate by default).
+      if(el.classList.contains('reveal') || el.classList.contains('no-reveal')) return;
+      if(el.querySelector && el.querySelector('form')) return;
+      el.classList.add('reveal');
+    });
+  });
+
+  // Collect all revealable elements on the page. Authors can still control
+  // exactly where animations run by adding/removing the `reveal` class.
+  const reveals = Array.from(document.querySelectorAll('.reveal'));
   if(reveals.length === 0) return;
 
   // keep pending timers so we can cancel them if the element leaves before the timeout
@@ -378,7 +397,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     entries.forEach(entry => {
       const el = entry.target;
       const idx = reveals.indexOf(el);
-      const delay = Math.max(0, idx) * 120; // stagger 120ms per item
+      // use a small stagger for items that live in the same list; if element isn't
+      // in the reveals array (shouldn't happen) fall back to 0
+      const delay = (idx >= 0 ? Math.max(0, idx) * 20 : 0);
 
       if(entry.isIntersecting){
         // schedule adding the class with a stagger; store timer so it can be cleared

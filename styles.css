@@ -555,7 +555,7 @@ textarea{min-height:75px; resize:vertical; margin-top: 10px;max-width: 100%;}
 .carousel-dots button.active{background:var(--gold)}
 
 /* Reveal animation helpers for section entrance */
-.reveal{ opacity:0; transform:translateY(12px); transition:opacity .54s cubic-bezier(.2,.9,.22,1), transform .54s cubic-bezier(.2,.9,.22,1); will-change:opacity,transform }
+.reveal{ opacity:0; transform:translateY(8px); transition:opacity .36s cubic-bezier(.2,.9,.22,1), transform .36s cubic-bezier(.2,.9,.22,1); will-change:opacity,transform }
 .reveal.in-view{ opacity:1; transform:none }
 @media (prefers-reduced-motion: reduce){ .reveal{ transition:none; transform:none; opacity:1 } }
 
