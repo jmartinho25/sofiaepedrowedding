@@ -369,21 +369,19 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 
   // Auto-assign `.reveal` to common content blocks unless the author opted out
   // with `.no-reveal`. This enables the effect site-wide without editing HTML.
-  const autoSelectors = [
-    'section > .wrap',
-    '.card:not(.carousel-card)',
-    '.moment-grid-item',
-    '#announce',
-  ];
-  autoSelectors.forEach(sel => {
-    document.querySelectorAll(sel).forEach(el => {
-      // Skip if the element explicitly opted out, or if it contains a form
-      // (we don't want forms to animate by default).
-      if(el.classList.contains('reveal') || el.classList.contains('no-reveal')) return;
-      if(el.querySelector && el.querySelector('form')) return;
-      el.classList.add('reveal');
+  // If `autoSelectors` is commented out by hand (for manual control), skip
+  // the auto-assignment instead of throwing a runtime error.
+  if(typeof autoSelectors !== 'undefined' && Array.isArray(autoSelectors)){
+    autoSelectors.forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        // Skip if the element explicitly opted out, or if it contains a form
+        // (we don't want forms to animate by default).
+        if(el.classList.contains('reveal') || el.classList.contains('no-reveal')) return;
+        if(el.querySelector && el.querySelector('form')) return;
+        el.classList.add('reveal');
+      });
     });
-  });
+  }
 
   // Collect all revealable elements on the page. Authors can still control
   // exactly where animations run by adding/removing the `reveal` class.
