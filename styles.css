@@ -358,6 +358,9 @@ textarea{min-height:75px; resize:vertical; margin-top: 10px;max-width: 100%;}
     /* reserve 3 lines on small screens */
     height: calc(1.45em * 3);
     max-height: calc(1.45em * 3);
+    /* Increase caption type on small screens for readability */
+    font-size: clamp(15px, 3.2vw, 18px);
+    padding: 0 12px;
   }
 }
 .footer{

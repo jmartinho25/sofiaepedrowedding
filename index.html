@@ -2,7 +2,11 @@
 <html lang="pt">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Temporarily disable pinch-zoom on mobile to mitigate crash/reload issues.
+  Note: this reduces accessibility (users cannot zoom). If this fixes the
+  issue we'll keep as a temporary mitigation while implementing a better
+  solution (image virtualisation). To revert, restore the original meta. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <!-- prevent iOS Safari from auto-detecting telephone numbers (IBAN should not become a tel: link) -->
   <meta name="format-detection" content="telephone=no">
 <title>Sofia & Pedro — 4 de Julho de 2026</title>
