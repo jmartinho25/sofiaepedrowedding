@@ -219,9 +219,33 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     }, { threshold: 0.25 });
     io.observe(carousel);
 
+    // Pause autoplay while the page is zoomed (pinch-zoom). On some mobile
+    // browsers, when the viewport is scaled the browser rasteriser increases
+    // memory usage and animated transitions can trigger a renderer crash.
+    // Use the visualViewport API where available to detect scale and pause.
+    const ZOOM_THRESHOLD = 1.02;
+    function isZoomed(){
+      try{ return (window.visualViewport && window.visualViewport.scale) ? (window.visualViewport.scale > ZOOM_THRESHOLD) : false; }
+      catch(e){ return false; }
+    }
+    if(window.visualViewport){
+      const onVV = ()=>{
+        if(isZoomed()){
+          // pause autoplay while zoomed
+          pause();
+        }else{
+          // resume autoplay only if carousel is visible and started
+          if(visible && started) play();
+        }
+      };
+      window.visualViewport.addEventListener('resize', onVV);
+      // run once to set initial state
+      onVV();
+    }
+
     // Also start on pointer/focus interaction in case user interacts before it comes into view
-    carousel.addEventListener('pointerenter', ()=>{ visible = true; start(); play(); }, { once:true });
-    carousel.addEventListener('focus', ()=>{ visible = true; start(); play(); }, { once:true });
+    carousel.addEventListener('pointerenter', ()=>{ visible = true; start(); if(!isZoomed()) play(); }, { once:true });
+    carousel.addEventListener('focus', ()=>{ visible = true; start(); if(!isZoomed()) play(); }, { once:true });
 
     // ensure initial layout is correct (no auto-advance yet)
     update();
