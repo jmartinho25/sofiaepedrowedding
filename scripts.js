@@ -367,57 +367,5 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
    reveal/staggering will run. Elements may still have the `reveal` class
    in the markup, but its styles are overridden in CSS to be inert. */
 
-// Scoped reveal for `#historia` only. This observer re-enables staggered
-// reveal inside the historia section while leaving the rest of the page
-// inert. It adds `.in-view` when elements enter and removes it when they
-// leave, but the removal is done instantly (no reverse transition) so the
-// exit is not visually janky.
-(function(){
-  const root = document.getElementById('historia');
-  if(!root) return;
-  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  // select sensible elements inside historia to animate
-  // use `:scope > .wrap` rather than `> .wrap` because a selector cannot
-  // start with a combinator — using `:scope` is the correct scoped child selector.
-  const selectors = [':scope > .wrap', '.card:not(.carousel-card)', '.carousel-card'];
-  const toReveal = [];
-  selectors.forEach(s => {
-    try{
-      root.querySelectorAll(s).forEach(el => toReveal.push(el));
-    }catch(err){
-      // if a selector is unsupported in an environment, skip it gracefully
-      console.warn('Scoped reveal: selector failed', s, err);
-    }
-  });
-  if(toReveal.length === 0) return;
-
-  // ensure they have the reveal class (authors can still opt-out with .no-reveal)
-  toReveal.forEach(el => { if(!el.classList.contains('no-reveal')) el.classList.add('reveal'); });
-
-  const timers = new WeakMap();
-  const baseStagger = 25;
-
-  const obs = new IntersectionObserver((entries)=>{
-    entries.forEach(entry => {
-      const el = entry.target;
-      const idx = toReveal.indexOf(el);
-      const delay = (idx >= 0 ? Math.max(0, idx) * baseStagger : 0);
-      const visibleNow = entry.isIntersecting || (entry.intersectionRatio && entry.intersectionRatio > 0.01);
-
-      if(visibleNow){
-        const t = setTimeout(()=>{ el.classList.add('in-view'); timers.delete(el); }, delay);
-        timers.set(el, t);
-      }else{
-        const pending = timers.get(el);
-        if(pending){ clearTimeout(pending); timers.delete(el); }
-        // remove `.in-view` instantly without running the reverse transition
-        const prev = el.style.transition;
-        try{ el.style.transition = 'none'; el.classList.remove('in-view'); el.getBoundingClientRect(); }
-        finally{ requestAnimationFrame(()=>{ el.style.transition = prev || ''; }); }
-      }
-    });
-  }, { threshold: [0, 0.01, 0.12], rootMargin: '0px 0px -8% 0px' });
-
-  toReveal.forEach(r => obs.observe(r));
-})();
+/* All scroll reveal JS disabled per user request. No scoped reveal observer
+   runs now; the page will not attempt to add/remove `.in-view` classes. */
